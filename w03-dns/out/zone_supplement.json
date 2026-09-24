@@ -1,0 +1,54 @@
+[
+  {
+    "site": "www.adobe.com",
+    "original_network": "other-wifi",
+    "resolver": "quad9",
+    "original_time_utc": "2026-09-24T06:03:06.309978+00:00",
+    "final_name": "a1319.dscr.akamai.net",
+    "checked_utc": "2026-09-24T11:54:06.553171+00:00",
+    "current_network": "not independently confirmed",
+    "queries": [
+      {
+        "time_utc": "2026-09-24T11:54:06.553264+00:00",
+        "server": "9.9.9.9",
+        "name": "a1319.dscr.akamai.net.",
+        "type": "SOA",
+        "id": 37516,
+        "transport": "UDP",
+        "rcode": "NOERROR",
+        "answer": [],
+        "authority": [
+          "dscr.akamai.net. 1000 IN SOA n0dscr.akamai.net. hostmaster.akamai.com. 1790250851 1000 1000 1000 1800"
+        ],
+        "additional": []
+      }
+    ],
+    "zone": "dscr.akamai.net"
+  },
+  {
+    "site": "www.bbc.co.uk",
+    "original_network": "other-wifi",
+    "resolver": "google",
+    "original_time_utc": "2026-09-24T06:03:07.600928+00:00",
+    "final_name": "bbc.map.fastly.net",
+    "checked_utc": "2026-09-24T11:54:06.626485+00:00",
+    "current_network": "not independently confirmed",
+    "queries": [
+      {
+        "time_utc": "2026-09-24T11:54:06.626535+00:00",
+        "server": "8.8.8.8",
+        "name": "bbc.map.fastly.net.",
+        "type": "SOA",
+        "id": 47813,
+        "transport": "UDP",
+        "rcode": "NOERROR",
+        "answer": [],
+        "authority": [
+          "fastly.net. 30 IN SOA ns1.fastly.net. hostmaster.fastly.com. 2017052201 3600 600 604800 30"
+        ],
+        "additional": []
+      }
+    ],
+    "zone": "fastly.net"
+  }
+]

@@ -1,0 +1,33 @@
+{
+  "time_utc": "2026-09-24T06:01:23.436867+00:00",
+  "interface": "eth0",
+  "capture_filter": "port 53",
+  "command": "python3 capture_part_a.py --interface eth0",
+  "exchanges": [
+    {
+      "server": "198.41.0.4",
+      "name": "www.korea.ac.kr.",
+      "id": 39132
+    },
+    {
+      "server": "210.101.61.1",
+      "name": "www.korea.ac.kr.",
+      "id": 19891
+    },
+    {
+      "server": "163.152.11.6",
+      "name": "www.korea.ac.kr.",
+      "id": 43734
+    }
+  ],
+  "address": "163.152.6.10",
+  "path": [
+    "198.41.0.4",
+    "210.101.61.1",
+    "163.152.11.6"
+  ],
+  "privacy_filter": "dns.qry.name == \"www.korea.ac.kr\" && dns.flags.recdesired == 0 && ((dns.id == 39132 && ip.addr == 198.41.0.4) || (dns.id == 19891 && ip.addr == 210.101.61.1) || (dns.id == 43734 && ip.addr == 163.152.11.6))",
+  "equivalent_command": "python3 task1_resolve.py www.korea.ac.kr",
+  "resolver_call": "task1_resolve.Resolver().resolve('www.korea.ac.kr')",
+  "network": "other-wifi"
+}
