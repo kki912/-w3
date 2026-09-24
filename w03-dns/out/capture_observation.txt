@@ -1,0 +1,1 @@
+직접 캡처한 위임 응답 #2는 Answer=0과 Authority의 NS를 담고, 최종 응답 #6는 Answer의 A=163.152.6.10를 담았다. 최대 DNS 응답은 341 bytes였다.
