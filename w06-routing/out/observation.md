@@ -1,0 +1,20 @@
+# Task 1 — Link State by Hand
+
+- Equal-cost routes use the lexicographically smallest first-hop neighbour, so the chosen route is deterministic. Real routers may use equal-cost multipath (ECMP) or select a route according to implementation-specific rules.
+- At `u`, traffic for `w` leaves through `x`: `u-x-y-w` costs 3, less than the direct `u-w` link, which costs 5.
+- Before `u-x` fails, `v` uses hop `v` and `w`, `x`, `y`, and `z` use hop `x`. After the cut, all four of `w`, `x`, `y`, and `z` use hop `v`; `v` remains unchanged.
+
+# Task 2 — Break a Real Network and Time the Repair
+
+- **A2:** On this capture, hop 1 is `175.203.124.1` and the first responsive upstream hop is `61.78.45.78` (hop 2). These are the observed gateway/first upstream router; traceroute does not label the administrative campus boundary, so the exact egress cannot be confirmed from hop names alone.
+- **A3:** The overseas `www.nic.cz` trace rises from about 5–6 ms at hop 5 to 131 ms at hop 6, then shows `palo-b24` (Palo Alto), `sjo` (San Jose), and European backbone cities. This supports a trans-Pacific crossing toward the US West Coast. Traceroute identifies routers and cities, not which parallel submarine cable carried the traffic, so naming one cable would be a guess.
+- **A4–A5:** `1.1.1.1` replied at hop 8 (6–7 ms), consistent with a nearby anycast replica. A `*` can mean ICMP probes/replies are filtered or rate-limited, or that a probe was lost; later hops replying after a `*` show that the timeout does not by itself mean forwarding stopped. The three traces are in `traceroute.txt`.
+- **B1–B3:** All three FRR routers reached `Full` OSPF adjacencies and learned a remote LAN: r1 learned `172.19.0.0/16`, r2 learned `172.20.0.0/16`, and r3 learned `172.21.0.0/16` via other routers. Three-router tables before and after the cut are in `route-before.txt` and `route-after.txt`.
+- **B4–B5:** Until three successive all-router snapshots agreed (250 ms polling interval), the measured interface-down failure took `3.73 s` and link restoration took `3.39 s`; `ospf-timers.txt` records Hello `10 s` / Dead `40 s`. The failure was an explicit `ip link set ... down`, so FRR detected the local interface change rather than waiting 40 seconds for missed Hellos. On restoration, Hellos establish the neighbor and OSPF adjacency before routes return. Both measurements include Docker query and polling overhead; the small difference is not a precise comparison of Hello versus Dead timers. Restored routes and elapsed time are in `route-restored.txt` and `link-restore.txt`.
+- **C1–C3:** Raising r1 eth0's OSPF cost from 10 to 100 kept the link up and changed r1's route to `172.19.0.0/16` from equal-cost multipath over eth0 and eth1 to eth1 only; the before/after tables are in `route-cost-before.txt` and `route-cost-after.txt`. The measured table-convergence time was `3.31 s` with the same polling method. A cost change floods an updated LSA without waiting for dead-neighbor detection, but this run's polling/Docker overhead masks that advantage.
+
+# Task 3 — Reconverge Without Recomputing the World
+
+- Between events, the router keeps each reachable node's shortest distance and predecessor, in addition to its forwarding table. This is O(V) extra persistent memory; a repair also builds temporary subtree and priority-queue state.
+- A failed or more expensive link outside the selected shortest-path tree needs no update. If it is in the tree, only its affected subtree is repaired. A new or cheaper link is checked against cached endpoint distances; a possible improvement or tie triggers a full SPF through `dijkstra_table()`.
+- On the 400-router, 1,000-event benchmark, the router used 152 full SPF runs versus the baseline's 1,001: 85% avoided, with all event tables correct. The recorded run took 2.40 s versus 1.48 s for the baseline because Python bookkeeping and incremental queue work cost more in this small benchmark. A real router can still prefer this trade-off: its scarce resource is CPU during network-wide reconvergence, while keeping O(V) route state in memory is relatively cheap.
