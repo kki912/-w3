@@ -1,2 +1,0 @@
-﻿r1 eth1 restored; all-router table stabilization: 3.39 s.
-Cost restored to 10; all-router table stabilization: 3.3 s.
