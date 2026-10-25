@@ -1,3 +1,0 @@
-Cost change: r1 eth0 OSPF cost 10 -> 100; link remained up.
-Polling interval: 0.25s; stable samples: 3.
-Measured all-router convergence: 7.30 s.

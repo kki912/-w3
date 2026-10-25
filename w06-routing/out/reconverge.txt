@@ -1,3 +1,0 @@
-Failure: r1 eth1 down -> all three OSPF routing tables changed and stabilized.
-Polling interval: 0.25s; stable samples: 3.
-Measured convergence: 4.38 s.
