@@ -1,0 +1,6 @@
+﻿Measurements on the three-router FRR 9.1.0 OSPF lab.
+Probe interval: 250 ms between complete all-router routing-table snapshots; elapsed time includes Docker CLI query and stability confirmation.
+Failure: r1 eth1 down -> all three OSPF tables changed and remained stable: 3.73 s.
+Link restoration: r1 eth1 up -> all three OSPF tables changed and remained stable: 3.39 s.
+Cost change: r1 eth0 OSPF cost 10 -> 100 -> all three OSPF tables changed and remained stable: 3.31 s.
+Hello/dead intervals are recorded in ospf-timers.txt.
