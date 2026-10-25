@@ -1,3 +1,0 @@
-Restoration: r1 eth1 up -> all three OSPF routing tables changed and stabilized.
-Polling interval: 0.25s; stable samples: 3.
-Measured restoration convergence: 4.34 s.
