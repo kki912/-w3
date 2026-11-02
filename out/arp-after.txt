@@ -1,0 +1,9 @@
+
+Interface: 211.216.237.220 --- 0xc
+  Internet Address      Physical Address      Type
+  211.216.237.1         70-30-5d-08-43-8a     dynamic   
+  224.0.0.2             01-00-5e-00-00-02     static    
+  224.0.0.22            01-00-5e-00-00-16     static    
+  224.0.0.251           01-00-5e-00-00-fb     static    
+  224.0.0.252           01-00-5e-00-00-fc     static    
+  239.255.255.250       01-00-5e-7f-ff-fa     static    

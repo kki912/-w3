@@ -1,17 +1,16 @@
-# Task 1 — Link State by Hand
+# Week 7 observations
 
-- Equal-cost routes use the lexicographically smallest first-hop neighbour, so the chosen route is deterministic. Real routers may use equal-cost multipath (ECMP) or select a route according to implementation-specific rules.
-- At `u`, traffic for `w` leaves through `x`: `u-x-y-w` costs 3, less than the direct `u-w` link, which costs 5.
-- Before `u-x` fails, `v` uses hop `v` and `w`, `x`, `y`, and `z` use hop `x`. After the cut, all four of `w`, `x`, `y`, and `z` use hop `v`; `v` remains unchanged.
+## Task 1 — Learning switch
+- A switch must not reflect a frame onto its ingress port: that can create a link-layer loop and duplicate traffic. A router forwards by its IP routing table, or drops a packet when it has no matching route; it does not flood unknown destinations across interfaces.
+- Aging by timeout forgets silent or disconnected stations without knowing they left; a more direct signal would be a link-down or explicit station-disconnect event.
+- A timeout may forget a still-connected but idle station, so its next frame is flooded; this is the trade-off for aging stale locations without an explicit departure signal.
 
-# Task 2 — Break a Real Network and Time the Repair
+## Task 2 — ARP
+- After flushing the Windows cache, the gateway entry `211.216.237.1` returned first when I pinged it; the host needed the gateway's MAC to send the ping on the local link. The table went from 9 entries (2 dynamic) before the clear to 6 (1 dynamic) after pinging the gateway and visiting the site; static multicast/broadcast entries remain, and the distant web server is absent because ARP resolves the local next hop, not remote hosts.
+- In the official 9th-edition trace, the request asking for `128.119.247.1` is sent to `ff:ff:ff:ff:ff:ff`, the link-layer broadcast; its matching reply is sent to `c4:41:1e:75:b1:52`, the requesting host. Source: J.F. Kurose and K.W. Ross, *Computer Networking: A Top-Down Approach*, 9th ed., <https://gaia.cs.umass.edu/kurose_ross/>; Copyright 1996-2025.
+- The trace has 178 broadcast requests and 1 unicast reply in 12.287 seconds: extrapolated, about 869 broadcast frames/minute reach a segment with M machines, or roughly 869(M-1) other-host receptions/minute (plus about 5 unicast replies/minute); this is a rate extrapolation, not a one-minute capture.
 
-- The Korea University trace reached ISP hop `61.78.45.78`, but the destination did not reply, so the campus egress cannot be identified from this non-campus connection. `www.ox.ac.uk` resolved to a Cloudflare CDN address; RTT jumped from about 6 ms to 131–145 ms at hop 6, suggesting a long-distance leg, but the trace cannot identify its city or submarine cable. `*` can mean probes/replies were filtered or rate-limited, or probes were lost; later replies show that a timeout alone does not mean forwarding stopped. Traces are in `traceroute.txt`.
-- `1.1.1.1` answered at hop 8 with 6 ms RTT, consistent with a nearby anycast replica. All three FRR routers reached `Full` OSPF adjacencies and learned a remote LAN: r1 learned `172.19.0.0/16`, r2 learned `172.20.0.0/16`, and r3 learned `172.21.0.0/16` via other routers; the before/after tables are captured in `route-before.txt` and `route-after.txt`.
-- Measured until three successive all-router snapshots agreed (250 ms pause between snapshots): failure `3.73 s`, link restoration `3.39 s`, and cost `10 -> 100` change `3.31 s`. The interfaces report Hello `10 s` / Dead `40 s` in `ospf-timers.txt`. Here the failure was an explicit local `ip link set ... down`, which FRR detects as an interface-down event instead of waiting 40 seconds for missed Hellos; the returned `3.73 s` includes table polling and Docker CLI overhead. Restoration was similar in this measurement, not a measured 40-second wait. The cost-change time was only `0.42 s` shorter than failure, within the observation overhead, so this run does not establish a significant speed difference. A silent neighbor failure would need dead-interval detection; a cost change floods a new LSA without that detection delay. Cost-change tables are in `route-cost-before.txt` and `route-cost-after.txt`.
-
-# Task 3 — Reconverge Without Recomputing the World
-
-- Between events, the router keeps each reachable node's shortest distance and predecessor, in addition to its forwarding table. This is O(V) extra persistent memory; a repair also builds temporary subtree and priority-queue state.
-- A failed or more expensive link outside the selected shortest-path tree needs no update. If it is in the tree, only its affected subtree is repaired. A new or cheaper link is checked against cached endpoint distances; a possible improvement or tie triggers a full SPF through `dijkstra_table()`.
-- On the 400-router, 1,000-event benchmark, the router used 152 full SPF runs versus the baseline's 1,001: 85% avoided, with all event tables correct. Wall time was 1.48 s versus 1.14 s for the baseline because Python bookkeeping and incremental queue work cost more in this small benchmark. A real router can still prefer this trade-off: its scarce resource is CPU during network-wide reconvergence, while keeping O(V) route state in memory is relatively cheap.
+## Task 3 — Bounded switch table
+- I estimate source frequency with a fixed four-row Count-Min Sketch, evict the least-frequent resident (LRU tie-break), and decline a new source unless its estimate exceeds the eviction candidate.
+- On the supplied benchmark, wasted deliveries fell from 323,380 to 159,252 (51%); delivered frames remained 46,347 and missed frames remained 0, so admission control protected frequent stations.
+- An attacker could flood the table with frames using many spoofed source MACs so legitimate destinations become unknown and get flooded; port security, per-port MAC limits, and rate limits reduce that risk.
